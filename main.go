@@ -17,9 +17,19 @@ import (
 
 // Read API token and company domain from environment variables
 var (
-    apiToken      = os.Getenv("PIPEDRIVE_API_TOKEN")
-    companyDomain = os.Getenv("PIPEDRIVE_COMPANY_DOMAIN")
+	apiToken      = os.Getenv("PIPEDRIVE_API_TOKEN")
+	companyDomain = os.Getenv("PIPEDRIVE_COMPANY_DOMAIN")
 )
+
+func init() {
+	if apiToken == "" {
+		log.Fatal("PIPEDRIVE_API_TOKEN environment variable is not set")
+	}
+	if companyDomain == "" {
+		log.Fatal("PIPEDRIVE_COMPANY_DOMAIN environment variable is not set")
+	}
+	prometheus.MustRegister(httpRequestsTotal, httpRequestDuration)
+}
 
 // Set up Prometheus metrics
 var (

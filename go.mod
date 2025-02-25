@@ -1,4 +1,4 @@
-module github.com/yourusername/pdapi_hometask
+module github.com/vnahynaliuk/pdapi_hometask
 
 go 1.24.0
 
