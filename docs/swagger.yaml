@@ -1,4 +1,9 @@
 basePath: /
+definitions:
+  main.CreateDeal:
+    type: object
+  main.UpdateDeal:
+    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -8,7 +13,8 @@ info:
 paths:
   /deals:
     get:
-      description: Retrieves all deals from the Pipedrive API
+      description: Retrieves all deals from the Pipedrive API with optional query
+        parameters.
       produces:
       - application/json
       responses:
@@ -17,19 +23,20 @@ paths:
           schema:
             additionalProperties: true
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Retrieve all deals
     post:
       consumes:
       - application/json
-      description: Creates a new deal via the Pipedrive API
+      description: Creates a new deal via the Pipedrive API.
       parameters:
       - description: Deal data
         in: body
         name: deal
         required: true
         schema:
-          additionalProperties: true
-          type: object
+          $ref: '#/definitions/main.CreateDeal'
       produces:
       - application/json
       responses:
@@ -38,20 +45,26 @@ paths:
           schema:
             additionalProperties: true
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Create a new deal
+  /deals/{id}:
     put:
       consumes:
       - application/json
-      description: Updates an existing deal via the Pipedrive API. Expects an "id"
-        field in the JSON body.
+      description: Updates an existing deal via the Pipedrive API.
       parameters:
-      - description: Deal data (must include 'id')
+      - description: The ID of the deal
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Deal update data
         in: body
         name: deal
         required: true
         schema:
-          additionalProperties: true
-          type: object
+          $ref: '#/definitions/main.UpdateDeal'
       produces:
       - application/json
       responses:
@@ -60,7 +73,14 @@ paths:
           schema:
             additionalProperties: true
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Update an existing deal
 schemes:
 - http
+securityDefinitions:
+  ApiKeyAuth:
+    in: query
+    name: api_token
+    type: apiKey
 swagger: "2.0"

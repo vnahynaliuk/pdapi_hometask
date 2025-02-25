@@ -17,7 +17,12 @@ const docTemplate = `{
     "paths": {
         "/deals": {
             "get": {
-                "description": "Retrieves all deals from the Pipedrive API",
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Retrieves all deals from the Pipedrive API with optional query parameters.",
                 "produces": [
                     "application/json"
                 ],
@@ -32,39 +37,13 @@ const docTemplate = `{
                     }
                 }
             },
-            "put": {
-                "description": "Updates an existing deal via the Pipedrive API. Expects an \"id\" field in the JSON body.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Update an existing deal",
-                "parameters": [
-                    {
-                        "description": "Deal data (must include 'id')",
-                        "name": "deal",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            },
             "post": {
-                "description": "Creates a new deal via the Pipedrive API",
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Creates a new deal via the Pipedrive API.",
                 "consumes": [
                     "application/json"
                 ],
@@ -79,8 +58,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/main.CreateDeal"
                         }
                     }
                 ],
@@ -94,6 +72,65 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/deals/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Updates an existing deal via the Pipedrive API.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Update an existing deal",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "The ID of the deal",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Deal update data",
+                        "name": "deal",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.UpdateDeal"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "main.CreateDeal": {
+            "type": "object"
+        },
+        "main.UpdateDeal": {
+            "type": "object"
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "api_token",
+            "in": "query"
         }
     }
 }`

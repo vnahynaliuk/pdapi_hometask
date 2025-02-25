@@ -3,26 +3,29 @@
 // @title Pipedrive Deals API
 // @version 1.0
 // @description A simple proxy to Pipedrive API for managing deals.
-//
+
 // @host localhost:8080
 // @BasePath /
 // @schemes http
+//
+// @securityDefinitions.apikey ApiKeyAuth
+// @in query
+// @name api_token
 package main
 
 import (
     "bytes"
-    "encoding/json"
+    _"encoding/json"
     "io"
     "log"
     "net/http"
     "os"
-    "strconv"
+    _"strconv"
     "time"
 
     "github.com/gorilla/mux"
     httpSwagger "github.com/swaggo/http-swagger"
-    _ "github.com/vnahynaliuk/pdapi_hometask/docs" 
-	_ "github.com/swaggo/files" 
+    _ "github.com/vnahynaliuk/pdapi_hometask/docs" // replace with your actual module path
     "github.com/prometheus/client_golang/prometheus"
     "github.com/prometheus/client_golang/prometheus/promhttp"
 )
@@ -60,15 +63,15 @@ func main() {
     r.Use(loggingMiddleware)
     r.Use(metricsMiddleware)
 
-    // Register API endpoints.
+    // GET and POST endpoints for deals.
     r.HandleFunc("/deals", getDeals).Methods("GET")
     r.HandleFunc("/deals", addDeal).Methods("POST")
-    r.HandleFunc("/deals", updateDeal).Methods("PUT")
+    // PUT endpoint now expects the deal ID as a path parameter.
+    r.HandleFunc("/deals/{id}", updateDeal).Methods("PUT")
 
     // Expose Prometheus metrics at /metrics.
     r.Handle("/metrics", promhttp.Handler())
-
-    // Swagger endpoint: /swagger/index.html
+    // Swagger UI endpoint.
     r.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
 
     log.Println("Server started on port 8080")
@@ -104,15 +107,76 @@ func forwardRequest(method, url string, body io.Reader) (*http.Response, error) 
     return client.Do(req)
 }
 
+// CreateDeal represents the request body for creating a deal.
+// Fields and examples are based on Pipedrive API documentation.
+type AddDeal struct {
+    Title             string   `json:"title" example:"Test Deal"`                              // REQUIRED
+    Value             string   `json:"value" example:"1000"`
+    Label             []int    `json:"label" example:"[1,2,3]"`
+    Currency          string   `json:"currency" example:"USD"`
+    UserID            int      `json:"user_id" example:"123"`
+    PersonID          int      `json:"person_id" example:"456"`
+    OrgID             int      `json:"org_id" example:"789"`
+    PipelineID        int      `json:"pipeline_id" example:"10"`
+    StageID           int      `json:"stage_id" example:"20"`
+    Status            string   `json:"status" example:"open" enums:"open,won,lost,deleted"`
+    OriginID          string   `json:"origin_id" example:"integration_xyz"`
+    Channel           int      `json:"channel" example:"1"`
+    ChannelID         string   `json:"channel_id" example:"ch_123"`
+    AddTime           string   `json:"add_time" example:"2023-08-21 12:34:56"`
+    WonTime           string   `json:"won_time" example:"2023-08-22 13:00:00"`
+    LostTime          string   `json:"lost_time" example:"2023-08-22 14:00:00"`
+    CloseTime         string   `json:"close_time" example:"2023-08-23 15:00:00"`
+    ExpectedCloseDate string   `json:"expected_close_date" example:"2023-08-30"`
+    Probability       float64  `json:"probability" example:"75.5"`
+    LostReason        string   `json:"lost_reason" example:"Price too high"`
+    VisibleTo         string   `json:"visible_to" example:"1" enums:"1,3,5,7"`
+}
+
+// UpdateDeal represents the request body for updating a deal.
+// All fields are optional.
+type UpdateDeal struct {
+    Title             *string  `json:"title,omitempty" example:"Updated Deal Title"`
+    Value             *string  `json:"value,omitempty" example:"1500"`
+    Label             []int    `json:"label,omitempty" example:"[1,2]"`
+    Currency          *string  `json:"currency,omitempty" example:"USD"`
+    UserID            *int     `json:"user_id,omitempty" example:"123"`
+    PersonID          *int     `json:"person_id,omitempty" example:"456"`
+    OrgID             *int     `json:"org_id,omitempty" example:"789"`
+    PipelineID        *int     `json:"pipeline_id,omitempty" example:"10"`
+    StageID           *int     `json:"stage_id,omitempty" example:"20"`
+    Status            *string  `json:"status,omitempty" example:"open" enums:"open,won,lost,deleted"`
+    Channel           *int     `json:"channel,omitempty" example:"1"`
+    ChannelID         *string  `json:"channel_id,omitempty" example:"ch_123"`
+    WonTime           *string  `json:"won_time,omitempty" example:"2023-08-22 13:00:00"`
+    LostTime          *string  `json:"lost_time,omitempty" example:"2023-08-22 14:00:00"`
+    CloseTime         *string  `json:"close_time,omitempty" example:"2023-08-23 15:00:00"`
+    ExpectedCloseDate *string  `json:"expected_close_date,omitempty" example:"2023-08-30"`
+    Probability       *float64 `json:"probability,omitempty" example:"75.5"`
+    LostReason        *string  `json:"lost_reason,omitempty" example:"Price too high"`
+    VisibleTo         *string  `json:"visible_to,omitempty" example:"1" enums:"1,3,5,7"`
+}
+
 // getDeals godoc
 // @Summary Retrieve all deals
-// @Description Retrieves all deals from the Pipedrive API
+// @Description Retrieves all deals from the Pipedrive API with optional query parameters.
 // @Produce json
+// @Security ApiKeyAuth
+// (Query parameters for GET are defined separately. See previous documentation.)
 // @Success 200 {object} map[string]interface{}
 // @Router /deals [get]
 func getDeals(w http.ResponseWriter, r *http.Request) {
-    url := "https://" + companyDomain + ".pipedrive.com/api/v1/deals?api_token=" + apiToken
-    resp, err := forwardRequest("GET", url, nil)
+    baseURL := "https://" + companyDomain + ".pipedrive.com/api/v1/deals?api_token=" + apiToken
+
+    // Append any query parameters from the client request.
+    q := r.URL.Query()
+    for key, values := range q {
+        for _, value := range values {
+            baseURL += "&" + key + "=" + value
+        }
+    }
+
+    resp, err := forwardRequest("GET", baseURL, nil)
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
@@ -124,10 +188,11 @@ func getDeals(w http.ResponseWriter, r *http.Request) {
 
 // addDeal godoc
 // @Summary Create a new deal
-// @Description Creates a new deal via the Pipedrive API
+// @Description Creates a new deal via the Pipedrive API.
 // @Accept json
 // @Produce json
-// @Param deal body map[string]interface{} true "Deal data"
+// @Security ApiKeyAuth
+// @Param deal body CreateDeal true "Deal data"
 // @Success 200 {object} map[string]interface{}
 // @Router /deals [post]
 func addDeal(w http.ResponseWriter, r *http.Request) {
@@ -149,32 +214,25 @@ func addDeal(w http.ResponseWriter, r *http.Request) {
 
 // updateDeal godoc
 // @Summary Update an existing deal
-// @Description Updates an existing deal via the Pipedrive API. Expects an "id" field in the JSON body.
+// @Description Updates an existing deal via the Pipedrive API.
 // @Accept json
 // @Produce json
-// @Param deal body map[string]interface{} true "Deal data (must include 'id')"
+// @Security ApiKeyAuth
+// @Param id path int true "The ID of the deal"
+// @Param deal body UpdateDeal true "Deal update data"
 // @Success 200 {object} map[string]interface{}
-// @Router /deals [put]
+// @Router /deals/{id} [put]
 func updateDeal(w http.ResponseWriter, r *http.Request) {
-    var data map[string]interface{}
-    if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
-        http.Error(w, "Invalid JSON", http.StatusBadRequest)
-        return
-    }
-    idFloat, ok := data["id"].(float64)
-    if !ok {
-        http.Error(w, "Missing or invalid 'id' field", http.StatusBadRequest)
-        return
-    }
-    id := strconv.Itoa(int(idFloat))
-    delete(data, "id") // remove "id" if the API does not expect it in the JSON
-    jsonData, err := json.Marshal(data)
+    vars := mux.Vars(r)
+    id := vars["id"]
+
+    bodyBytes, err := io.ReadAll(r.Body)
     if err != nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
+        http.Error(w, err.Error(), http.StatusBadRequest)
         return
     }
     url := "https://" + companyDomain + ".pipedrive.com/api/v1/deals/" + id + "?api_token=" + apiToken
-    resp, err := forwardRequest("PUT", url, bytes.NewBuffer(jsonData))
+    resp, err := forwardRequest("PUT", url, bytes.NewBuffer(bodyBytes))
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
