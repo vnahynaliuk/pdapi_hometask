@@ -22,7 +22,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Retrieves all deals from the Pipedrive API with optional query parameters.",
+                "description": "Retrieves all deals from the Pipedrive API.",
                 "produces": [
                     "application/json"
                 ],
@@ -43,7 +43,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Creates a new deal via the Pipedrive API.",
+                "description": "Creates a new deal via the Pipedrive API. All deals created through the API will have their origin set to API.",
                 "consumes": [
                     "application/json"
                 ],
