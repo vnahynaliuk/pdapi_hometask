@@ -58,7 +58,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/main.CreateDeal"
+                            "$ref": "#/definitions/models.CreateDeal"
                         }
                     }
                 ],
@@ -102,7 +102,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/main.UpdateDeal"
+                            "$ref": "#/definitions/models.UpdateDeal"
                         }
                     }
                 ],
@@ -119,10 +119,10 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "main.CreateDeal": {
+        "models.CreateDeal": {
             "type": "object"
         },
-        "main.UpdateDeal": {
+        "models.UpdateDeal": {
             "type": "object"
         }
     },
@@ -142,7 +142,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/",
 	Schemes:          []string{"http"},
 	Title:            "Pipedrive Deals API",
-	Description:      "A simple proxy to Pipedrive API for managing deals.",
+	Description:      "A simple proxy to the Pipedrive API for managing deals.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

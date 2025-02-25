@@ -1,13 +1,13 @@
 basePath: /
 definitions:
-  main.CreateDeal:
+  models.CreateDeal:
     type: object
-  main.UpdateDeal:
+  models.UpdateDeal:
     type: object
 host: localhost:8080
 info:
   contact: {}
-  description: A simple proxy to Pipedrive API for managing deals.
+  description: A simple proxy to the Pipedrive API for managing deals.
   title: Pipedrive Deals API
   version: "1.0"
 paths:
@@ -36,7 +36,7 @@ paths:
         name: deal
         required: true
         schema:
-          $ref: '#/definitions/main.CreateDeal'
+          $ref: '#/definitions/models.CreateDeal'
       produces:
       - application/json
       responses:
@@ -64,7 +64,7 @@ paths:
         name: deal
         required: true
         schema:
-          $ref: '#/definitions/main.UpdateDeal'
+          $ref: '#/definitions/models.UpdateDeal'
       produces:
       - application/json
       responses:

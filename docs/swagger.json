@@ -4,7 +4,7 @@
     ],
     "swagger": "2.0",
     "info": {
-        "description": "A simple proxy to Pipedrive API for managing deals.",
+        "description": "A simple proxy to the Pipedrive API for managing deals.",
         "title": "Pipedrive Deals API",
         "contact": {},
         "version": "1.0"
@@ -55,7 +55,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/main.CreateDeal"
+                            "$ref": "#/definitions/models.CreateDeal"
                         }
                     }
                 ],
@@ -99,7 +99,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/main.UpdateDeal"
+                            "$ref": "#/definitions/models.UpdateDeal"
                         }
                     }
                 ],
@@ -116,10 +116,10 @@
         }
     },
     "definitions": {
-        "main.CreateDeal": {
+        "models.CreateDeal": {
             "type": "object"
         },
-        "main.UpdateDeal": {
+        "models.UpdateDeal": {
             "type": "object"
         }
     },
