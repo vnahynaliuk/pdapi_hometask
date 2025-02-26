@@ -39,7 +39,7 @@ pdapi_hometask/
 │   └── deal.go           # Request body models (CreateDeal, UpdateDeal) with example tags
 ├── utils/
 │   └── forward.go        # Utility function to forward HTTP requests
-└── docs/                 # Auto-generated Swagger documentation (if available)
+└── docs/                 # Auto-generated Swagger documentation
 ```
 
 ---
