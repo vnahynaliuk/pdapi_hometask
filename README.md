@@ -71,7 +71,7 @@ pdapi_hometask/
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/yourusername/pdapi_hometask.git
+   git clone https://github.com/vnahynaliuk/pdapi_hometask.git
    cd pdapi_hometask
    ```
 
