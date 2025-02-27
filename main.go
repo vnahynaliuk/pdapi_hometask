@@ -19,7 +19,7 @@ import (
 
 	"github.com/gorilla/mux"
 	httpSwagger "github.com/swaggo/http-swagger"
-	_ "github.com/vnahynaliuk/pdapi_hometask/docs" // Replace with your actual module path
+	_ "github.com/vnahynaliuk/pdapi_hometask/docs"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/vnahynaliuk/pdapi_hometask/handlers"
 	"github.com/vnahynaliuk/pdapi_hometask/middleware"
